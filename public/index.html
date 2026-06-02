@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>习惯伙伴 — AI分身打卡</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="auth-page">
+
+  <div class="splash-header">
+    <div class="hero-3d">
+      <video class="hero-3d-video" autoplay loop muted playsinline preload="auto">
+        <source src="/video/hero-3d.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="app-logo">🌟 习惯伙伴</div>
+    <p class="app-tagline">找到你的AI分身，一起养成好习惯</p>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" id="tab-login">登录</button>
+      <button class="auth-tab-btn" id="tab-register">注册</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="form-login">
+      <div class="form-group">
+        <label for="login-username">用户名</label>
+        <input type="text" id="login-username" placeholder="请输入用户名" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label for="login-password">密码</label>
+        <input type="password" id="login-password" placeholder="请输入密码" autocomplete="current-password" />
+      </div>
+      <p class="form-error" id="login-error"></p>
+      <button type="submit" class="btn-primary btn-full" id="btn-login">登录</button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="form-register" class="hidden">
+      <div class="form-group">
+        <label for="reg-username">用户名</label>
+        <input type="text" id="reg-username" placeholder="2-20个字符（字母/数字/中文）" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label for="reg-password">密码</label>
+        <input type="password" id="reg-password" placeholder="至少6位" autocomplete="new-password" />
+      </div>
+      <div class="form-group">
+        <label for="reg-confirm">确认密码</label>
+        <input type="password" id="reg-confirm" placeholder="再次输入密码" autocomplete="new-password" />
+      </div>
+      <p class="form-error" id="reg-error"></p>
+      <button type="submit" class="btn-primary btn-full" id="btn-register">注册并开始</button>
+    </form>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    // Redirect if already logged in
+    (function() {
+      const token = getToken();
+      const user = getUser();
+      if (token && user) {
+        window.location.href = user.role_id ? '/plan.html' : '/character-test.html';
+      }
+    })();
+
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+    const formLogin = document.getElementById('form-login');
+    const formRegister = document.getElementById('form-register');
+    const loginError = document.getElementById('login-error');
+    const regError = document.getElementById('reg-error');
+
+    tabLogin.addEventListener('click', () => {
+      tabLogin.classList.add('active');
+      tabRegister.classList.remove('active');
+      formLogin.classList.remove('hidden');
+      formRegister.classList.add('hidden');
+      loginError.textContent = '';
+    });
+
+    tabRegister.addEventListener('click', () => {
+      tabRegister.classList.add('active');
+      tabLogin.classList.remove('active');
+      formRegister.classList.remove('hidden');
+      formLogin.classList.add('hidden');
+      regError.textContent = '';
+    });
+
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.textContent = '';
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-login');
+
+      if (!username || !password) {
+        loginError.textContent = '请填写用户名和密码';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '登录中…';
+
+      try {
+        const data = await api.post('/auth/login', { username, password });
+        saveAuth(data.token, data.user);
+        window.location.href = data.user.role_id ? '/plan.html' : '/character-test.html';
+      } catch (err) {
+        loginError.textContent = err.message;
+        btn.disabled = false;
+        btn.textContent = '登录';
+      }
+    });
+
+    formRegister.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      regError.textContent = '';
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const btn = document.getElementById('btn-register');
+
+      if (!username || !password || !confirm) {
+        regError.textContent = '请填写所有字段';
+        return;
+      }
+      if (password !== confirm) {
+        regError.textContent = '两次密码不一致';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '注册中…';
+
+      try {
+        const data = await api.post('/auth/register', { username, password });
+        saveAuth(data.token, data.user);
+        window.location.href = '/character-test.html';
+      } catch (err) {
+        regError.textContent = err.message;
+        btn.disabled = false;
+        btn.textContent = '注册并开始';
+      }
+    });
+  </script>
+</body>
+</html>

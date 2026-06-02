@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>习惯伙伴 — 统计</title>
+  <link rel="stylesheet" href="/css/style.css?v=20260512b" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">⭐</span>
+      <span class="logo-text">习惯伙伴</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-tab="today">
+        <span class="nav-icon">☀️</span><span>今天</span>
+      </button>
+      <button class="nav-item" data-tab="plans">
+        <span class="nav-icon">📋</span><span>我的计划</span>
+      </button>
+      <button class="nav-item active" data-tab="stats">
+        <span class="nav-icon">📊</span><span>统计</span>
+      </button>
+      <button class="nav-item" data-tab="settings">
+        <span class="nav-icon">⚙️</span><span>设置</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-profile">
+      <div class="profile-avatar" id="sb-avatar"></div>
+      <div class="profile-info">
+        <div class="profile-name" id="sb-name">伙伴</div>
+        <div class="profile-quote" id="sb-quote">分析你的数据中…</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN AREA ============ -->
+  <main class="main-area stats-area">
+
+    <header class="stats-page-header">
+      <div class="stats-page-heading">
+        <h1>统计 <span class="stats-sparkle">✨</span></h1>
+        <p class="stats-page-sub" id="stats-page-sub">分析中…</p>
+      </div>
+      <div class="stats-page-filter">
+        <button class="filter-pill" id="filter-pill" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="filter-pill-label" id="filter-pill-label">全部习惯</span>
+          <span class="filter-pill-chev">▾</span>
+        </button>
+        <div class="filter-menu hidden" id="filter-menu" role="listbox"></div>
+      </div>
+    </header>
+
+    <div class="stats-layout">
+
+      <!-- Sub sidebar: view scope -->
+      <nav class="stats-subnav">
+        <button class="ssn-item active" data-view="week">
+          <span class="ssn-icon">📅</span><span>周视图</span>
+        </button>
+        <button class="ssn-item" data-view="month">
+          <span class="ssn-icon">🗓</span><span>月视图</span>
+        </button>
+        <button class="ssn-item" data-view="year">
+          <span class="ssn-icon">👑</span><span>年视图</span>
+        </button>
+        <button class="ssn-item" data-view="completion">
+          <span class="ssn-icon">📊</span><span>完成统计</span>
+        </button>
+      </nav>
+
+      <!-- ============ WEEK VIEW ============ -->
+      <section class="view-pane view-week" id="view-week">
+        <div class="week-grid">
+          <!-- Character card -->
+          <div class="stats-character-card">
+            <div class="stats-char-portrait" id="stats-char-portrait"></div>
+            <div class="stats-char-bubble">
+              <strong id="stats-char-name">学者猫</strong><span>说：</span>
+              <p id="stats-char-msg">分析中…</p>
+            </div>
+          </div>
+
+          <!-- Habit picker -->
+          <div class="habit-picker-card">
+            <div class="hp-header">
+              <span class="hp-title">选择习惯<small>（可多选）</small></span>
+              <button class="hp-all" id="hp-all-w">全部习惯</button>
+            </div>
+            <div class="habit-picker-grid" id="habit-picker-w">
+              <div class="hp-empty">还没有习惯哦</div>
+            </div>
+          </div>
+
+          <!-- KPI cards under character -->
+          <div class="stats-cards-grid week-kpi-grid">
+            <div class="s-card s-card-orange">
+              <div class="s-card-icon">🔥</div>
+              <div class="s-card-label">连续打卡</div>
+              <div class="s-card-value"><span id="kpi-w-streak">0</span><small>天</small></div>
+            </div>
+            <div class="s-card s-card-yellow">
+              <div class="s-card-icon">⭐</div>
+              <div class="s-card-label">本周完成率</div>
+              <div class="s-card-value"><span id="kpi-w-rate">0</span><small>%</small></div>
+            </div>
+            <div class="s-card s-card-pink">
+              <div class="s-card-icon">🏆</div>
+              <div class="s-card-label">本周 XP</div>
+              <div class="s-card-value"><span id="kpi-w-xp">0</span></div>
+            </div>
+            <div class="s-card s-card-blue">
+              <div class="s-card-icon">✓</div>
+              <div class="s-card-label">本周打卡</div>
+              <div class="s-card-value"><span id="kpi-w-tasks">0</span><small>次</small></div>
+            </div>
+          </div>
+
+          <!-- Day bars -->
+          <div class="bar-chart-card">
+            <div class="bar-chart-header">
+              <button class="period-nav" data-shift="week-prev">‹</button>
+              <span class="period-label" id="week-label">—</span>
+              <button class="period-nav" data-shift="week-next">›</button>
+            </div>
+            <div class="day-bars" id="week-day-bars"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MONTH VIEW ============ -->
+      <section class="view-pane view-month" id="view-month" hidden>
+        <div class="month-top-kpis">
+          <div class="m-kpi m-kpi-orange">
+            <span class="m-kpi-icon">🔥</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-m-streak">0</span><small>天</small></div>
+              <div class="m-kpi-label">连续打卡</div>
+            </div>
+          </div>
+          <div class="m-kpi m-kpi-yellow">
+            <span class="m-kpi-icon">⭐</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-m-rate">0</span><small>%</small></div>
+              <div class="m-kpi-label">本月完成率</div>
+            </div>
+          </div>
+          <div class="m-kpi m-kpi-pink">
+            <span class="m-kpi-icon">🏆</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-m-xp">0</span><small>XP</small></div>
+              <div class="m-kpi-label">本月 XP</div>
+            </div>
+          </div>
+          <div class="m-kpi m-kpi-blue">
+            <span class="m-kpi-icon">📚</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-m-habits">0</span><small>个</small></div>
+              <div class="m-kpi-label">活跃习惯</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="month-mid">
+          <div class="calendar-card">
+            <div class="cal-header">
+              <button class="period-nav" data-shift="month-prev">‹</button>
+              <span class="period-label" id="month-label">—</span>
+              <button class="period-nav" data-shift="month-next">›</button>
+            </div>
+            <div class="cal-dows">
+              <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="cal-legend">
+              <span class="cal-lg"><span class="cal-dot cal-dot-full"></span>全部完成</span>
+              <span class="cal-lg"><span class="cal-dot cal-dot-partial"></span>部分完成</span>
+              <span class="cal-lg"><span class="cal-dot cal-dot-miss"></span>未打卡</span>
+            </div>
+          </div>
+
+          <div class="month-side">
+            <div class="habit-picker-card">
+              <div class="hp-header">
+                <span class="hp-title">选择习惯<small>（可多选）</small></span>
+                <button class="hp-all" id="hp-all-m">全部</button>
+              </div>
+              <div class="habit-picker-grid" id="habit-picker-m">
+                <div class="hp-empty">还没有习惯哦</div>
+              </div>
+            </div>
+
+            <div class="month-summary-card">
+              <div class="ms-title">本月坚持总览</div>
+              <div class="ms-list" id="month-summary">
+                <div class="ms-empty">还没有数据</div>
+              </div>
+            </div>
+
+            <div class="encourage-card">
+              <span class="encourage-emoji">🌱</span>
+              <div class="encourage-info">
+                <div class="encourage-title">继续保持！</div>
+                <div class="encourage-text" id="encourage-text">你已经在路上了～</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ YEAR VIEW ============ -->
+      <section class="view-pane view-year" id="view-year" hidden>
+        <div class="year-top-kpis">
+          <div class="m-kpi m-kpi-orange">
+            <span class="m-kpi-icon">📅</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-y-days">0</span><small>天</small></div>
+              <div class="m-kpi-label">打卡天数</div>
+            </div>
+          </div>
+          <div class="m-kpi m-kpi-yellow">
+            <span class="m-kpi-icon">⭐</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-y-rate">0</span><small>%</small></div>
+              <div class="m-kpi-label">完成率</div>
+            </div>
+          </div>
+          <div class="m-kpi m-kpi-pink">
+            <span class="m-kpi-icon">🔥</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-y-streak">0</span><small>天</small></div>
+              <div class="m-kpi-label">最长连击</div>
+            </div>
+          </div>
+          <div class="m-kpi m-kpi-purple">
+            <span class="m-kpi-icon">🏆</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-y-xp">0</span><small>XP</small></div>
+              <div class="m-kpi-label">总积分</div>
+            </div>
+          </div>
+          <div class="m-kpi m-kpi-blue">
+            <span class="m-kpi-icon">📚</span>
+            <div class="m-kpi-info">
+              <div class="m-kpi-value"><span id="kpi-y-habits">0</span><small>个</small></div>
+              <div class="m-kpi-label">习惯数</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="year-trend-card">
+          <div class="year-trend-header">
+            <span class="chart-title" id="year-trend-title">2026年习惯坚持趋势</span>
+            <div class="year-selector">
+              <button class="period-nav" data-shift="year-prev">‹</button>
+              <span class="period-label" id="year-label">2026年</span>
+              <button class="period-nav" data-shift="year-next">›</button>
+            </div>
+          </div>
+          <div class="year-trend-body" id="year-trend"></div>
+        </div>
+
+        <div class="year-bottom">
+          <div class="month-bars-card">
+            <div class="chart-title">每月打卡天数</div>
+            <div class="month-bars" id="year-month-bars"></div>
+          </div>
+          <div class="habit-pie-card">
+            <div class="chart-title">习惯完成度分布</div>
+            <div class="pie-wrap">
+              <svg id="habit-pie" viewBox="0 0 120 120"></svg>
+              <div class="pie-legend" id="habit-pie-legend"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ COMPLETION VIEW ============ -->
+      <section class="view-pane view-completion" id="view-completion" hidden>
+        <div class="completion-grid">
+          <div class="habit-picker-card completion-picker">
+            <div class="hp-header">
+              <span class="hp-title">选择习惯<small>（可多选）</small></span>
+              <button class="hp-all" id="hp-all-c">全部习惯</button>
+            </div>
+            <div class="habit-picker-grid completion-picker-grid" id="habit-picker-c">
+              <div class="hp-empty">还没有习惯哦</div>
+            </div>
+          </div>
+
+          <div class="completion-card">
+            <div class="completion-card-header">
+              <button class="period-nav" data-shift="hm-prev">‹</button>
+              <span class="period-label" id="hm-label">—</span>
+              <button class="period-nav" data-shift="hm-next">›</button>
+            </div>
+            <div class="completion-dows">
+              <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+            </div>
+            <div class="completion-cal" id="heatmap"></div>
+            <div class="completion-footer">
+              <div class="completion-legend" id="completion-legend"></div>
+              <div class="completion-stats">
+                <div class="cstat">
+                  <div class="cstat-label">本月完成天数</div>
+                  <div class="cstat-value"><span id="cstat-days">0</span><small>天</small></div>
+                </div>
+                <div class="cstat">
+                  <div class="cstat-label">本月完成率</div>
+                  <div class="cstat-value"><span id="cstat-rate">0</span><small>%</small></div>
+                </div>
+                <div class="cstat">
+                  <div class="cstat-label">连续完成</div>
+                  <div class="cstat-value"><span id="cstat-streak">0</span><small>天</small></div>
+                </div>
+                <div class="cstat">
+                  <div class="cstat-label">最长连续</div>
+                  <div class="cstat-value"><span id="cstat-max-streak">0</span><small>天</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Hover tooltip -->
+<div class="hm-tooltip hidden" id="hm-tooltip"></div>
+
+<script src="/js/api.js?v=20260512b"></script>
+<script src="/js/stats.js?v=20260512b"></script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>习惯伙伴 — 今天</title>
+  <link rel="stylesheet" href="/css/style.css?v=20260511a" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">⭐</span>
+      <span class="logo-text">习惯伙伴</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="today">
+        <span class="nav-icon">☀️</span><span>今天</span>
+      </button>
+      <button class="nav-item" data-tab="plans">
+        <span class="nav-icon">📋</span><span>我的计划</span>
+      </button>
+      <button class="nav-item" data-tab="stats">
+        <span class="nav-icon">📊</span><span>统计</span>
+      </button>
+      <button class="nav-item" data-tab="settings">
+        <span class="nav-icon">⚙️</span><span>设置</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-profile">
+      <div class="profile-avatar" id="sb-avatar"><img src="/img/scholar-cat-avatar.png" alt="学者猫" class="char-img" /></div>
+      <div class="profile-info">
+        <div class="profile-name" id="sb-name">学者猫</div>
+        <div class="profile-quote" id="sb-quote">根据计划分析…</div>
+      </div>
+      <button class="btn-switch" id="btn-switch-char">更换分身</button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN AREA ============ -->
+  <main class="main-area">
+
+    <!-- Header -->
+    <header class="main-header">
+      <div class="greeting">
+        <h1><span id="greeting-prefix">早上好</span>，<span id="user-name">朋友</span> ☀️</h1>
+        <p class="date" id="current-date">2026年5月6日 · 星期三</p>
+      </div>
+      <div class="motto-card">
+        <span class="motto-icon">✨</span>
+        <span class="motto-text" id="motto-text">每一个小步伐，都在塑造更好的你</span>
+      </div>
+    </header>
+
+    <div class="main-grid">
+
+      <!-- Main Content Column -->
+      <div class="main-content">
+
+        <!-- AI Card -->
+        <section class="ai-card">
+          <div class="ai-character">
+            <div class="character-3d" id="character-3d">
+              <video id="hero-3d-video" class="hero-3d-video-src" autoplay loop muted playsinline preload="auto">
+                <source src="/video/hero-3d.mp4" type="video/mp4" />
+              </video>
+              <canvas id="hero-3d-canvas" class="hero-3d-canvas"></canvas>
+            </div>
+          </div>
+          <div class="ai-content">
+            <div class="ai-bubble">
+              <p id="ai-greeting">我们将有条不紊地前进！今天先从最容易的开始吧～</p>
+              <span class="ai-watermark" id="ai-watermark">🐾</span>
+            </div>
+            <div class="today-progress">
+              <div class="progress-info">
+                <span>今日进度</span>
+                <span id="progress-text">0/0</span>
+              </div>
+              <div class="progress-bar-large">
+                <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Daily Plan -->
+        <section class="plan-card">
+          <div class="plan-header">
+            <h2>今日计划</h2>
+            <button class="btn-add-plan" id="btn-add-habit">+ 添加计划</button>
+          </div>
+          <ul class="plan-list" id="habit-list"></ul>
+          <div class="empty-state hidden" id="habits-empty">
+            <div class="empty-emoji">🌱</div>
+            <p>还没有计划，点击上方「+ 添加计划」开始你的第一个习惯吧</p>
+          </div>
+        </section>
+
+        <!-- Discovery Row -->
+        <div class="discovery-row">
+
+          <div class="discovery-card test-card" id="card-test">
+            <div class="test-glow"></div>
+            <h3>找到最懂你的分身 ✨</h3>
+            <p>6道题测出你的性格类型</p>
+            <div class="test-preview">
+              <div class="test-q">问题 3 / 6</div>
+              <div class="test-question-preview">你更喜欢哪种方式完成目标？</div>
+              <div class="test-options">
+                <div class="test-option">📋 设定目标</div>
+                <div class="test-option">🌊 享受过程</div>
+              </div>
+            </div>
+            <a class="test-skip" href="/character-test.html">开始测试 →</a>
+          </div>
+
+          <div class="discovery-card explore-card">
+            <h3>探索分身与计划</h3>
+            <p>查看所有AI伙伴和计划进度</p>
+            <div class="avatar-row" id="avatar-row"></div>
+            <div class="plan-preview" id="plan-preview"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <aside class="right-column">
+
+        <!-- Calendar -->
+        <section class="cal-card">
+          <div class="cal-header">
+            <button class="cal-nav" id="cal-prev">‹</button>
+            <span id="cal-title">2026年5月</span>
+            <button class="cal-nav" id="cal-next">›</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </section>
+
+        <!-- Streak -->
+        <section class="streak-card-large">
+          <div class="streak-content">
+            <div class="streak-icon">🔥</div>
+            <div class="streak-days" id="streak-days-num">0</div>
+            <div class="streak-unit">连续打卡</div>
+            <p class="streak-msg" id="streak-msg">开始你的旅程吧！</p>
+          </div>
+          <div class="streak-decor" id="streak-decor"><img src="/img/scholar-cat-avatar.png" alt="学者猫" style="width:64px;height:64px;border-radius:50%;object-fit:cover;box-shadow:0 4px 10px rgba(0,0,0,0.1)" /></div>
+        </section>
+
+        <!-- Monthly Stats -->
+        <section class="stats-row">
+          <div class="mini-stat">
+            <div class="mini-stat-icon icon-blue">📅</div>
+            <div class="mini-stat-num" id="month-days">0</div>
+            <div class="mini-stat-label">打卡天数</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-icon icon-yellow">📦</div>
+            <div class="mini-stat-num" id="month-tasks">0</div>
+            <div class="mini-stat-label">完成任务</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-icon icon-green">✓</div>
+            <div class="mini-stat-num" id="month-rate">0%</div>
+            <div class="mini-stat-label">完成率</div>
+          </div>
+        </section>
+
+      </aside>
+
+    </div>
+  </main>
+</div>
+
+<!-- ============ FLOATING CHAT ============ -->
+<button class="chat-fab" id="chat-fab">💬</button>
+
+<div class="chat-overlay hidden" id="chat-overlay">
+  <div class="chat-header">
+    <div class="chat-header-info">
+      <div class="chat-header-avatar" id="chat-header-avatar"><img src="/img/scholar-cat-avatar.png" alt="学者猫" class="char-img" /></div>
+      <div>
+        <div class="chat-header-name" id="chat-header-name">学者猫</div>
+        <div class="chat-header-tag" id="chat-header-tag">理性分析派</div>
+      </div>
+    </div>
+    <button id="chat-close">×</button>
+  </div>
+  <div class="chat-history" id="chat-history">
+    <div class="chat-welcome" id="chat-welcome">
+      <div class="char-big" id="chat-welcome-emoji"><img src="/img/scholar-cat-avatar.png" alt="学者猫" style="width:60px;height:60px;border-radius:50%;object-fit:cover" /></div>
+      <p>你好呀！跟我聊聊天，<br>或者告诉我今天的状态吧～</p>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chat-input" placeholder="说说话…" maxlength="200" />
+    <button class="btn-send" id="btn-send">➤</button>
+  </div>
+</div>
+
+<!-- ============ ADD HABIT MODAL ============ -->
+<div class="modal-overlay hidden" id="modal-add-habit">
+  <div class="modal-card">
+    <h3 class="modal-title">添加新习惯 🌱</h3>
+    <div class="form-group">
+      <label for="habit-name-input">习惯名称</label>
+      <input type="text" id="habit-name-input" placeholder="例如：每日阅读30分钟" maxlength="50" />
+    </div>
+    <div class="form-group">
+      <label>打卡频率</label>
+      <div class="radio-group">
+        <label><input type="radio" name="freq-type" value="daily" checked /> 每天</label>
+        <label><input type="radio" name="freq-type" value="weekly" /> 每周</label>
+      </div>
+    </div>
+    <div class="form-group hidden" id="weekly-count-group">
+      <label for="freq-count">每周次数（1-7）</label>
+      <input type="number" id="freq-count" min="1" max="7" value="3" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btn-cancel-habit">取消</button>
+      <button class="btn-primary" id="btn-save-habit">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DAY DETAIL MODAL ============ -->
+<div class="modal-overlay hidden" id="modal-day-detail">
+  <div class="modal-card day-detail-card">
+    <h3 class="modal-title" id="day-detail-title">某月某日</h3>
+    <div class="day-detail-summary" id="day-detail-summary">—</div>
+    <ul class="day-detail-list" id="day-detail-list"></ul>
+    <div class="day-detail-empty hidden" id="day-detail-empty">这一天还没有任何计划呢～</div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="btn-close-day-detail">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ XP TOAST ============ -->
+<div class="xp-toast" id="xp-toast">+10 XP 🎉</div>
+
+<!-- ============ RESET MODAL ============ -->
+<div class="confirm-modal hidden" id="modal-reset">
+  <div class="confirm-card">
+    <h3 class="confirm-title">⚠️ 确认重置数据？</h3>
+    <p class="confirm-desc">此操作将清除所有打卡记录、聊天记录，并将XP、等级和连续天数归零。习惯列表会保留。<br><br>此操作<strong>不可撤销</strong>。</p>
+    <div class="confirm-actions">
+      <button class="btn-danger btn-full" id="btn-confirm-reset">确认重置</button>
+      <button class="btn-secondary btn-full" id="btn-cancel-reset">取消</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js?v=20260509a"></script>
+<script src="/js/plan.js?v=20260512b"></script>
+</body>
+</html>

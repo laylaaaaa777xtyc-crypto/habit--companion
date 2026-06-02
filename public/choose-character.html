@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>选择你的专属伙伴</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="choose-page">
+
+  <div class="choose-header">
+    <h1>选择你的专属伙伴 💫</h1>
+    <p>每位伙伴都有独特的个性，选一位陪你成长吧！</p>
+  </div>
+
+  <div class="character-grid" id="character-grid"></div>
+
+  <div class="choose-footer">
+    <button class="btn-primary btn-full" id="btn-confirm" disabled>请先选择一位伙伴</button>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    if (!getToken()) window.location.href = '/index.html';
+
+    const CHARACTERS = [
+      { id: 1, name: '学者猫', emoji: '🐱', title: '理性分析派', quote: '"根据计划分析……"', desc: '冷静博学，用数据和逻辑帮你分析习惯成效。喜欢制定计划的你的最佳拍档！', img: '/img/scholar-cat-avatar.png' },
+      { id: 2, name: '勇者犬', emoji: '🐶', title: '行动力派', quote: '"冲啊！今天也要战胜拖延！"', desc: '充满活力，永远斗志昂扬！专治拖延症，带你冲破一切障碍！', img: '/img/brave-dog-avatar.png' },
+      { id: 3, name: '精灵鹿', emoji: '🦌', title: '温柔治愈派', quote: '"慢慢来，你已经很棒了"', desc: '温和体贴，从不催促。在你疲惫时给你最温暖的陪伴和鼓励。', img: '/img/spirit-deer-avatar.png' },
+      { id: 4, name: '机械龙', emoji: '🐉', title: '效率数据派', quote: '"效率提升X%，继续保持"', desc: '精准高效，把一切量化。帮你用最科学的方式优化你的习惯系统。', img: '/img/mecha-dragon-avatar.png' },
+      { id: 5, name: '小幽灵', emoji: '👻', title: '轻松随意派', quote: '"今天不想动？那就休息一下呗～"', desc: '可爱又随性，不给你压力。让坚持习惯这件事变得轻松有趣！', img: '/img/ghostie-avatar.png' },
+    ];
+
+    let selectedId = null;
+    const grid = document.getElementById('character-grid');
+    const btnConfirm = document.getElementById('btn-confirm');
+
+    CHARACTERS.forEach(char => {
+      const card = document.createElement('div');
+      card.className = 'character-card';
+      card.dataset.id = char.id;
+      const avatarHtml = char.img
+        ? `<img src="${char.img}" alt="${char.name}" class="char-img" />`
+        : char.emoji;
+      card.innerHTML = `
+        <div class="char-card-avatar">${avatarHtml}</div>
+        <div class="char-card-info">
+          <div class="char-card-name">${char.name}</div>
+          <span class="char-card-tag">${char.title}</span>
+          <div class="char-card-quote">${char.quote}</div>
+        </div>
+        <div class="char-card-check">✅</div>
+      `;
+      card.addEventListener('click', () => selectChar(char.id, card));
+      grid.appendChild(card);
+    });
+
+    function selectChar(id, card) {
+      document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedId = id;
+      btnConfirm.disabled = false;
+      btnConfirm.textContent = `选择${CHARACTERS.find(c => c.id === id).name} ✨`;
+    }
+
+    btnConfirm.addEventListener('click', async () => {
+      if (!selectedId) return;
+      btnConfirm.disabled = true;
+      btnConfirm.textContent = '保存中…';
+      try {
+        await api.put('/user/role', { role_id: selectedId });
+        const user = getUser();
+        if (user) { user.role_id = selectedId; saveAuth(getToken(), user); }
+        window.location.href = '/plan.html';
+      } catch (err) {
+        alert(err.message);
+        btnConfirm.disabled = false;
+        btnConfirm.textContent = `选择${CHARACTERS.find(c => c.id === selectedId).name} ✨`;
+      }
+    });
+  </script>
+</body>
+</html>

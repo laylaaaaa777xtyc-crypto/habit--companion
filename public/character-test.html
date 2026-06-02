@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>找到你的专属伙伴</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="test-page">
+
+  <div class="page-header">
+    <h1 class="page-title">✨ 性格测试</h1>
+    <button class="btn-skip" id="btn-skip">跳过 → 自选角色</button>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+    <p class="progress-text" id="progress-text">第 1 题 / 共 6 题</p>
+  </div>
+
+  <div class="question-card" id="question-card">
+    <div class="question-emoji" id="question-emoji">🤔</div>
+    <p class="question-text" id="question-text">加载中…</p>
+    <div class="answer-buttons">
+      <button class="btn-answer btn-yes" id="btn-yes">是的 ✓</button>
+      <button class="btn-answer btn-no" id="btn-no">不太是 ✗</button>
+    </div>
+  </div>
+
+  <div class="result-card hidden" id="result-card">
+    <div class="result-avatar" id="result-avatar"></div>
+    <h2 class="result-name" id="result-name"></h2>
+    <span class="result-tag" id="result-tag"></span>
+    <p class="result-desc" id="result-desc"></p>
+    <div class="result-actions">
+      <button class="btn-primary" id="btn-choose-result">选择TA！开始打卡 🎉</button>
+      <button class="btn-secondary" id="btn-see-all">看看所有角色 →</button>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    // Auth guard
+    if (!getToken()) window.location.href = '/index.html';
+
+    const QUESTIONS = [
+      { emoji: '📋', text: '你更喜欢制定详细的计划，再按部就班地行动吗？' },
+      { emoji: '⚡', text: '遇到困难时，你会立刻采取行动去解决它吗？' },
+      { emoji: '💬', text: '你经常需要别人的鼓励，才能坚持下去吗？' },
+      { emoji: '📊', text: '你更注重效率和数据分析，而非感受和直觉吗？' },
+      { emoji: '🎮', text: '你喜欢轻松有趣的氛围，不喜欢太大压力吗？' },
+      { emoji: '🌱', text: '你更倾向于慢慢来、循序渐进，而不是快速冲刺吗？' },
+    ];
+
+    const CHARACTER_META = {
+      1: { name: '学者猫', emoji: '🐱', title: '理性分析派', desc: '冷静博学，用数据和逻辑帮你分析习惯成效，适合喜欢制定计划的你！', img: '/img/scholar-cat-avatar.png' },
+      2: { name: '勇者犬', emoji: '🐶', title: '行动力派', desc: '充满活力，永远斗志昂扬！专治拖延症，是你最好的战斗伙伴！', img: '/img/brave-dog-avatar.png' },
+      3: { name: '精灵鹿', emoji: '🦌', title: '温柔治愈派', desc: '温和体贴，从不催促。在你疲惫时给你最温暖的陪伴和鼓励。', img: '/img/spirit-deer-avatar.png' },
+      4: { name: '机械龙', emoji: '🐉', title: '效率数据派', desc: '精准高效，把一切量化。帮你用最科学的方式优化你的习惯系统。', img: '/img/mecha-dragon-avatar.png' },
+      5: { name: '小幽灵', emoji: '👻', title: '轻松随意派', desc: '可爱又随性，不给你压力。让坚持习惯这件事变得轻松有趣！', img: '/img/ghostie-avatar.png' },
+    };
+
+    // Scoring matrix: [yes_points, no_points] per character
+    // Each entry: [charId, points]
+    const MATRIX = [
+      { yes: [[1,2]], no: [[2,1],[5,1]] },
+      { yes: [[2,2]], no: [[3,1],[1,1]] },
+      { yes: [[3,2]], no: [[4,1],[1,1]] },
+      { yes: [[4,2]], no: [[3,1],[5,1]] },
+      { yes: [[5,2]], no: [[1,1],[4,1]] },
+      { yes: [[3,2]], no: [[2,1],[4,1]] },
+    ];
+
+    function scoreTest(answers) {
+      const scores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      answers.forEach((ans, i) => {
+        const pts = ans ? MATRIX[i].yes : MATRIX[i].no;
+        pts.forEach(([id, v]) => scores[id] += v);
+      });
+      let best = 1, bestScore = -1;
+      for (const [id, s] of Object.entries(scores)) {
+        if (s > bestScore) { bestScore = s; best = parseInt(id); }
+      }
+      return best;
+    }
+
+    let current = 0;
+    const answers = [];
+
+    function showQuestion(idx) {
+      const q = QUESTIONS[idx];
+      document.getElementById('question-emoji').textContent = q.emoji;
+      document.getElementById('question-text').textContent = q.text;
+      document.getElementById('progress-fill').style.width = `${(idx / QUESTIONS.length) * 100}%`;
+      document.getElementById('progress-text').textContent = `第 ${idx + 1} 题 / 共 ${QUESTIONS.length} 题`;
+    }
+
+    function handleAnswer(isYes) {
+      answers.push(isYes);
+      current++;
+
+      if (current >= QUESTIONS.length) {
+        showResult();
+      } else {
+        showQuestion(current);
+      }
+    }
+
+    function showResult() {
+      document.getElementById('progress-fill').style.width = '100%';
+      document.getElementById('progress-text').textContent = '测试完成！';
+      document.getElementById('question-card').classList.add('hidden');
+
+      const roleId = scoreTest(answers);
+      const char = CHARACTER_META[roleId];
+
+      const ra = document.getElementById('result-avatar');
+      if (char.img) ra.innerHTML = `<img src="${char.img}" alt="${char.name}" class="char-img" />`;
+      else ra.textContent = char.emoji;
+      document.getElementById('result-name').textContent = char.name;
+      document.getElementById('result-tag').textContent = char.title;
+      document.getElementById('result-desc').textContent = char.desc;
+
+      const resultCard = document.getElementById('result-card');
+      resultCard.classList.remove('hidden');
+
+      document.getElementById('btn-choose-result').onclick = async () => {
+        try {
+          await api.put('/user/role', { role_id: roleId });
+          const user = getUser();
+          if (user) { user.role_id = roleId; saveAuth(getToken(), user); }
+          window.location.href = '/plan.html';
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+
+      document.getElementById('btn-see-all').onclick = () => {
+        window.location.href = '/choose-character.html';
+      };
+    }
+
+    showQuestion(0);
+
+    document.getElementById('btn-yes').addEventListener('click', () => handleAnswer(true));
+    document.getElementById('btn-no').addEventListener('click', () => handleAnswer(false));
+    document.getElementById('btn-skip').addEventListener('click', () => {
+      window.location.href = '/choose-character.html';
+    });
+  </script>
+</body>
+</html>
