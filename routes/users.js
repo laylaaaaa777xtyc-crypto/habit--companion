@@ -4,6 +4,13 @@ const { db, xpToNextLevel, xpPercent, LEVEL_THRESHOLDS, todayStr } = require('..
 
 const router = express.Router();
 
+router.get('/list', auth, (req, res) => {
+  const users = db.prepare(
+    'SELECT id, username, level, created_at FROM users ORDER BY id ASC'
+  ).all();
+  res.json({ users });
+});
+
 router.get('/profile', auth, (req, res) => {
   const userId = req.user.id;
   const today = todayStr();

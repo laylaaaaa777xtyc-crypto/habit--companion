@@ -249,6 +249,32 @@
 <!-- ============ XP TOAST ============ -->
 <div class="xp-toast" id="xp-toast">+10 XP 🎉</div>
 
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="modal-overlay hidden" id="modal-settings">
+  <div class="modal-card settings-card">
+    <h3 class="modal-title">⚙️ 设置</h3>
+
+    <div class="settings-section">
+      <div class="settings-label">当前账号</div>
+      <div class="settings-current-user" id="settings-current-user">—</div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-label">注册账号 (<span id="settings-user-count">0</span>)</div>
+      <ul class="settings-user-list" id="settings-user-list"></ul>
+    </div>
+
+    <div class="settings-section">
+      <button class="btn-secondary btn-full" id="btn-logout">退出登录</button>
+      <button class="btn-danger btn-full" id="btn-open-reset" style="margin-top:10px;">重置我的数据</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary btn-full" id="btn-close-settings">关闭</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ RESET MODAL ============ -->
 <div class="confirm-modal hidden" id="modal-reset">
   <div class="confirm-card">

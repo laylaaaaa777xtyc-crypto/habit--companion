@@ -827,21 +827,74 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     } else if (tab === 'stats') {
       window.location.href = '/stats.html';
     } else if (tab === 'settings') {
-      document.getElementById('modal-reset').classList.remove('hidden');
+      openSettings();
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
 });
 
-// ============ SWITCH CHARACTER & RESET ============
+// ============ SWITCH CHARACTER ============
 document.getElementById('btn-switch-char').addEventListener('click', () => {
   window.location.href = '/choose-character.html';
 });
 
+// ============ SETTINGS ============
+function resetNavToToday() {
+  document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', i === 0));
+}
+
+async function openSettings() {
+  document.getElementById('modal-settings').classList.remove('hidden');
+  const me = getUser();
+  document.getElementById('settings-current-user').textContent =
+    me ? `${me.username} (ID: ${me.id})` : '未登录';
+
+  const listEl = document.getElementById('settings-user-list');
+  const countEl = document.getElementById('settings-user-count');
+  listEl.innerHTML = '<li class="settings-user-row muted">加载中…</li>';
+
+  try {
+    const { users } = await apiFetch('/user/list');
+    countEl.textContent = users.length;
+    listEl.innerHTML = '';
+    for (const u of users) {
+      const li = document.createElement('li');
+      li.className = 'settings-user-row';
+      const isMe = me && u.id === me.id;
+      const created = (u.created_at || '').split(' ')[0] || '';
+      li.innerHTML = `
+        <div class="settings-user-main">
+          <span class="settings-user-name">${u.username}${isMe ? ' <span class="settings-user-badge">当前</span>' : ''}</span>
+          <span class="settings-user-meta">Lv.${u.level} · ${created}</span>
+        </div>
+      `;
+      listEl.appendChild(li);
+    }
+    if (users.length === 0) {
+      listEl.innerHTML = '<li class="settings-user-row muted">暂无账号</li>';
+    }
+  } catch (err) {
+    listEl.innerHTML = `<li class="settings-user-row muted">加载失败：${err.message}</li>`;
+  }
+}
+
+document.getElementById('btn-close-settings').addEventListener('click', () => {
+  document.getElementById('modal-settings').classList.add('hidden');
+  resetNavToToday();
+});
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+  clearAuth();
+  window.location.href = '/index.html';
+});
+
+document.getElementById('btn-open-reset').addEventListener('click', () => {
+  document.getElementById('modal-reset').classList.remove('hidden');
+});
+
 document.getElementById('btn-cancel-reset').addEventListener('click', () => {
   document.getElementById('modal-reset').classList.add('hidden');
-  document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', i === 0));
 });
 
 document.getElementById('btn-confirm-reset').addEventListener('click', async () => {
@@ -850,12 +903,20 @@ document.getElementById('btn-confirm-reset').addEventListener('click', async () 
   try {
     await apiFetch('/user/reset', { method: 'DELETE', body: { confirm: true } });
     document.getElementById('modal-reset').classList.add('hidden');
-    document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', i === 0));
+    document.getElementById('modal-settings').classList.add('hidden');
+    resetNavToToday();
     await refreshAll();
     showToast('数据已重置 🔄');
   } catch (err) { alert(err.message); }
   finally { btn.disabled = false; btn.textContent = '确认重置'; }
 });
+
+if (window.location.hash === '#settings') {
+  document.querySelectorAll('.nav-item').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === 'settings');
+  });
+  openSettings();
+}
 
 document.getElementById('card-test').addEventListener('click', (e) => {
   if (e.target.closest('.test-skip')) return;
