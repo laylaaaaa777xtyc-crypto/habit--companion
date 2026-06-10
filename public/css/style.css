@@ -735,7 +735,7 @@ input { font-family: inherit; }
 }
 
 .ai-character {
-  width: 450px; height: 330px;
+  width: 340px; height: 250px;
   display: flex;
   align-items: flex-end;
   justify-content: center;

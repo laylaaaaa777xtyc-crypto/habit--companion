@@ -135,7 +135,10 @@ const CHARACTER_META = {
     quote: '慢慢来，你已经很棒了', paw: '🌿',
     img: { full: '/img/spirit-deer-full.png', avatar: '/img/spirit-deer-avatar.png' },
     video: '/video/spirit-deer-3d.mp4',
-    videoCrop: { x: 0.18, y: 0.02, w: 0.66, h: 0.96 }
+    videoCrop: { x: 0.18, y: 0.02, w: 0.66, h: 0.96 },
+    // Face/fur has near-white tones that leaked to the edge background via the
+    // default 232 threshold, leaving a hollow face. Only strip near-pure white.
+    videoChroma: { whiteThreshold: 250, edgeSoftThreshold: 240 }
   },
   4: {
     name: '机械龙', emoji: '🐉', title: '效率数据派',
