@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: habit-companion
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DB_PATH
+        value: /data/habit.db
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        value: https://api.deepseek.com/v1
+      - key: LLM_MODEL
+        value: deepseek-chat
+    disk:
+      name: habit-data
+      mountPath: /data
+      sizeGB: 1
